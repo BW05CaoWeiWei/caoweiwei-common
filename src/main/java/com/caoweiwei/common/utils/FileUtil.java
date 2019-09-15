@@ -1,6 +1,13 @@
 package com.caoweiwei.common.utils;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -70,7 +77,70 @@ public class FileUtil {
 		return fileName.substring(dotIndex+1);
 	}
 	
+	/**
+	 * 
+	 * @param key
+	 * @return
+	 */
+	public static String getSystemProp(String key) {
+		
+		String propValue = System.getProperty(key);
+		return propValue;
+		
+	}
 	
+	/**
+	 * 返回文件以指定单位大小表示
+	 */
+	public long  getSize(String fileName,FileUnit fileUnit) {
+		File file = new File(fileName);
+		
+		
+		long  size = file.length();
+		switch (fileUnit) {
+			case B:
+				return size;
+			case KB:
+				return size/1024;
+			case MB:
+				return size/1024/1024;
+			case GB:
+				return size/1024/1024/1024;
+			case TB:
+				return size/1024/1024/1024/1024;
+			case PB:
+				return size/1024/1024/1024/1024/1024;
+			default:
+				return 0;
+		}
+		
+	}
+	
+	/**
+	 * 
+	 * @param fileName
+	 * @param constructor
+	 * @return
+	 * @throws IOException
+	 * @throws NoSuchMethodException
+	 * @throws SecurityException
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws IllegalArgumentException
+	 * @throws InvocationTargetException
+	 */
+	public static List fileToBean(String fileName,Constructor constructor) throws IOException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		File file = new File(fileName);
+		BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+		String lineString=null;
+		List  list = new ArrayList();
+		while((lineString =  bufferedReader.readLine()) !=null){
+			String[] split = lineString.split("\\|");
+			Object object = constructor.newInstance(split);
+			list.add(object);
+		}
+		return list;
+	}
 	
 	
 	
